@@ -17,14 +17,16 @@ namespace PUBGAssetExtractor
             try
             {
                 Console.WriteLine("[+] PUBG Asset extractor");
-
+                
+                //Ensure insage is correct
                 if (args.Length != 1)
                 {
                     Console.WriteLine($"[-] Invalid usage ({args.Length} args passed)");
                     Console.ReadKey();
                     return;
                 }
-
+                
+                //Ensure input path is correct
                 string PUBG = args[0];
                 if (!Directory.Exists(PUBG) || !PUBG.EndsWith("\\PUBG"))
                 {
@@ -58,20 +60,23 @@ namespace PUBGAssetExtractor
                 //Get all .pak files in the Paks directory
                 foreach (string file_path in Directory.GetFiles(Paks, "*.pak", SearchOption.TopDirectoryOnly))
                 {
+                    //Get the file name
                     string file_name = Path.GetFileName(file_path);
                     Console.WriteLine($"[*] Processing {file_name}");
-
+                    
+                    //Create the output directory
                     string file_output = Output + "\\" + file_name;
                     Directory.CreateDirectory(file_output);
-
+                    
+                    //Create the process
                     Process p = new Process();
                     p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     p.StartInfo.FileName = Quickbms;
-                    //P.StartInfo.CreateNoWindow = false;
                     p.StartInfo.Arguments = $"\"{UE4}\" \"{file_path}\" \"{file_output}\"";
                     p.Start();
                     p.WaitForExit();
-
+                    
+                    //Check exit code (must be 0 if succeed)
                     if (p.ExitCode != 0)
                         Console.WriteLine($"[-] Extraction failed");
                 }
@@ -85,11 +90,11 @@ namespace PUBGAssetExtractor
             }
             finally
             {
-                //Release quickbms
+                //Remove quickbms
                 if (File.Exists(Quickbms))
                     File.Delete(Quickbms);
 
-                //Release quickbms script
+                //Remove quickbms script
                 if (File.Exists(UE4))
                     File.Delete(UE4);
             }
